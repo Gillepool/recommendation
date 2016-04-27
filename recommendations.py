@@ -22,12 +22,12 @@ criticss={'Daniel Gilljam': {"Toy Story": 5.0, "Deadpool": 3.5, "Star Wars": 5.0
 
 
 #Distans mellan tvp personers smak typ algoritm
-def sim_distance(prefs, person1, person2):
+def sim_distance(data, person1, person2):
 
 
     si={}
-    for item in prefs[person1]:
-        if item in prefs[person2]:
+    for item in data[person1]:
+        if item in data[person2]:
             si[item]=1
 
     #Om man inte har någon rating gemensamt
@@ -35,8 +35,8 @@ def sim_distance(prefs, person1, person2):
         return 0
 
     # Summerar skillnaden mellan personerna upphöjt i 2
-    sum_of_squares=sum([pow(prefs[person1][item]-prefs[person2][item],2)
-                        for item in prefs[person1] if item in prefs[person2]])
+    sum_of_squares=sum([pow(data[person1][item]-data[person2][item],2)
+                        for item in data[person1] if item in data[person2]])
 
 
 
@@ -45,13 +45,13 @@ def sim_distance(prefs, person1, person2):
 
 
 #Pearson correlation Score algoritm
-def sim_pearson(prefs, p1, p2):
+def sim_pearson(data, p1, p2):
 
 
     #En dict med gemensamma betygsatta items(filmer)
     si = {}
-    for item in prefs[p1]:
-        if item in prefs[p2]:
+    for item in data[p1]:
+        if item in data[p2]:
             si[item]=1
 
     #
@@ -62,15 +62,15 @@ def sim_pearson(prefs, p1, p2):
         return 0
 
     #Summerar alla preferenser
-    sum1=sum([prefs[p1][it] for it in si])
-    sum2 = sum([prefs[p2][it] for it in si])
+    sum1=sum([data[p1][it] for it in si])
+    sum2 = sum([data[p2][it] for it in si])
 
     #Samma emen upphöjt
-    sum1Sq = sum([pow(prefs[p1][it],2) for it in si])
-    sum2Sq = sum([pow(prefs[p2][it],2) for it in si])
+    sum1Sq = sum([pow(data[p1][it],2) for it in si])
+    sum2Sq = sum([pow(data[p2][it],2) for it in si])
 
     #summera produktena
-    pSum = sum([prefs[p1][it]*prefs[p2][it] for it in si])
+    pSum = sum([data[p1][it]*data[p2][it] for it in si])
 
     #Beräknar pearson-score för algoritmen
     num=pSum-(sum1*sum2/n)
@@ -88,8 +88,8 @@ print("Korrelation: ", sim_pearson(criticss, "Daniel Gilljam", "Allan Brallan"))
 
 
 # Rankar kritikerna(personerna)
-def top_matches(prefs, person, n, similarity=sim_pearson):
-    scores = [(similarity(prefs, person, other), other) for other in prefs if other !=person]
+def top_matches(data, person, n, similarity=sim_pearson):
+    scores = [(similarity(data, person, other), other) for other in data if other !=person]
 
     scores.sort()
     scores.reverse()
@@ -97,32 +97,33 @@ def top_matches(prefs, person, n, similarity=sim_pearson):
 
 
 #Få rekommendationer baserad på vad du har gemensqamt med andra
-def getRecommendations(prefs, person, similarity=sim_pearson):
+def getRecommendations(data, person, similarity=sim_pearson):
     totals={}
-    simSums={}
-    for other in prefs:
+    similiaritySums={}
+
+    for other in data:
 
         #Jämför inte med dig själv
         if other == person: continue
-        sim=similarity(prefs, person, other)
+        sim=similarity(data, person, other)
 
         #ignorera 0 eller mindre
         if sim<=0:  continue
-        for item in prefs[other]:
+        for item in data[other]:
 
             #Bara items(filmer) som jag(personen) inte har sett
-            if item not in prefs[person] or prefs[person][item] == 0:
+            if item not in data[person] or data[person][item] == 0:
                 #likheten * score
                 totals.setdefault(item, 0)
-                totals[item]+=prefs[other][item]*sim
+                totals[item]+=data[other][item]*sim
 
                 #summera alla likheter
-                simSums.setdefault(item, 0)
-                simSums[item]+=sim
+                similiaritySums.setdefault(item, 0)
+                similiaritySums[item]+=sim
 
 
 
-    rankings=[(total/simSums[item], item) for item, total, in totals.items()]
+    rankings=[(total/similiaritySums[item], item) for item, total, in totals.items()]
 
     rankings.sort()
     rankings.reverse()
@@ -130,37 +131,37 @@ def getRecommendations(prefs, person, similarity=sim_pearson):
 
 
 
-def transformPrefs(prefs):
+def transformPrefs(data):
     result={}
-    for person in prefs:
-        for item in prefs[person]:
+    for person in data:
+        for item in data[person]:
             result.setdefault(item, {})
 
             #Flippar personen och items
-            result[item][person]=prefs[person][item]
+            result[item][person]=data[person][item]
     return result
 
 #Jämför items med varandra istället för personer, är bättre vid en större data
-def calculateSimilarItems(prefs, n):
+def calculateSimilarItems(data, n):
     # Create a dict of items showing which other items they are most similar to
     #skapar en dict med items(filmer) som andra items(filmer) som dem har mest gemensamt med
     result = {}
 
     #Inverterar preferens matricen
-    itemPrefs = transformPrefs(prefs)
+    itemData = transformPrefs(data)
     C=0
-    for item in itemPrefs:
+    for item in itemData:
         #Status update för stora datasets
         C+=1
         if C%100==0:
-            print("%d / %d" % (C, len(itemPrefs)))
+            print("%d / %d" % (C, len(itemData)))
             #Hitta den som har mest gemensamt med en viss item med sim_distance algoritmen
-        scores = top_matches(itemPrefs, item, n=n,similarity=sim_distance)
+        scores = top_matches(itemData, item, n=n,similarity=sim_distance)
         result[item] = scores
     return result
 
-def getRecommendedItem(prefs, itemMatch, user):
-    userRating=prefs[user]
+def getRecommendedItem(data, itemMatch, user):
+    userRating=data[user]
     scores={}
     totalSim={}
 
@@ -249,7 +250,7 @@ def loadMovieLens(path='./ml-100k'):
     return prefs
 
 
-def search(prefs, words, path='./ml-100k'):
+def search(words, path='./ml-100k'):
 
     count=0
     found={}
