@@ -11,13 +11,13 @@ recommendations = Flask(__name__)
 
 
 
-criticss={'Daniel Gilljam': {"Toy Story": 5.0, "Deadpool": 3.5, "Star Wars": 5.0, "Avengers": 3.5, "Snake on a plane": 2.5},
-         'Kalle Balle': {"Toy Story": 3.0, "Deadpool": 5.0, "Star Wars": 3.0, "Avengers": 3.0, "Snake on a plane": 4.5},
-         'Olle Polle': {"Toy Story": 5.0, "Deadpool": 3.0, "Star Wars": 5.0, "Avengers": 3.5, "Snake on a plane": 2.5, "Monsters Inc": 5.0},
-         'Chen chin Long': {"Toy Story": 3.5, "Star Trek": 4.5, "Star Wars": 3.5, "Avengers": 4.5, "Snake on a plane": 1.0},
-         'Hoo Lee Fuk': {'Toy Story': 3.0, "Star Trek": 5.0, "Star Wars": 5.0, "Avengers": 3.0, "Snake on a plane": 2.5, "Monsters Inc": 1.0},
-         'Wai Lee Min': {'Toy Story': 2.5, "Star Wars": 3.5, "Deadpool": 4.5, "Snake on a plane": 4.3, "Monsters Inc": 2.0},
-         'Allan Brallan': {"Naruto": 5.0, "Deadpool": 5.0, "Star Wars": 3.5, "Toy Story": 4.5, "Monsters Inc": 4.5}}
+criticss={'Daniel': {"Toy Story": 5.0, "Deadpool": 3.5, "Star Wars": 5.0, "Avengers": 3.5, "Snake on a plane": 2.5},
+         'Kalle': {"Toy Story": 3.0, "Deadpool": 5.0, "Star Wars": 3.0, "Avengers": 3.0, "Snake on a plane": 4.5},
+         'Olle': {"Toy Story": 5.0, "Deadpool": 3.0, "Star Wars": 5.0, "Avengers": 3.5, "Snake on a plane": 2.5, "Monsters Inc": 5.0},
+         'Per': {"Toy Story": 3.5, "Star Trek": 4.5, "Star Wars": 3.5, "Avengers": 4.5, "Snake on a plane": 1.0},
+         'Random': {'Toy Story': 3.0, "Star Trek": 5.0, "Star Wars": 5.0, "Avengers": 3.0, "Snake on a plane": 2.5, "Monsters Inc": 1.0},
+         'Random2': {'Toy Story': 2.5, "Star Wars": 3.5, "Deadpool": 4.5, "Snake on a plane": 4.3, "Monsters Inc": 2.0},
+         'Random3': {"Naruto": 5.0, "Deadpool": 5.0, "Star Wars": 3.5, "Toy Story": 4.5, "Monsters Inc": 4.5}}
 
 
 
@@ -84,7 +84,7 @@ def sim_pearson(data, p1, p2):
 
 
 #Kollar likheten mellan två personer mellan 1 till -1. ju närmare 1 ju högre korrelation, ju närmare -1 ju lägre korrelation med den personen
-print("Korrelation: ", sim_pearson(criticss, "Daniel Gilljam", "Allan Brallan"))
+print("Korrelation: ", sim_pearson(criticss, "Daniel", "Kalle"))
 
 
 # Rankar kritikerna(personerna)
@@ -189,10 +189,10 @@ def getRecommendedItem(data, itemMatch, user):
 
 #En negativ korrelation ger en indukation att den personen som gillar filmen nedan troligvis inte gillar den film med en negativ korrelation
 # från 1 till -1. Där 1 är att all ratings är samma som en person och -1 är ingen samma. ju närmare 1 ju högre korrelation med den personen ju längre ju sämre korrelation
-print("Korrelation mellan top 5 stycken och Daniel Gilljam:", top_matches(criticss, 'Daniel Gilljam', n=5))
+print("Korrelation mellan top 5 stycken och Daniel:", top_matches(criticss, 'Daniel', n=5))
 
 #Få rekommendationer på filmer personen inte har sett och ge en estimerad rating.
-print("Filmer du bör se dom du inte sett, person-baserad rekommendation: ", getRecommendations(criticss, "Daniel Gilljam"))
+print("Filmer du bör se dom du inte sett, person-baserad rekommendation: ", getRecommendations(criticss, "Daniel"))
 
 
 # Test av del.is.ous
@@ -271,7 +271,7 @@ prefs = loadMovieLens()
 
 itemsim = calculateSimilarItems(criticss, n=5)
 #Item-baserad rekommendation, fungerar bättre än person-baserad rekommenadtion vid större data. Generellt lite bättre.
-getRecsNow = getRecommendedItem(criticss, itemsim, 'Daniel Gilljam')
+getRecsNow = getRecommendedItem(criticss, itemsim, 'Daniel')
 print("Få Rekommendationer på filmer du inte sett men item-baserad rekommendation", getRecsNow)
 
 
